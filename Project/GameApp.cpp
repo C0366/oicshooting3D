@@ -11,6 +11,7 @@
 #include	"GameApp.h"
 #include	"Player.h"
 #include	"Stage.h"
+#include	"Stage1.h"
 
 //カメラ
 CCamera					gCamera;
@@ -18,6 +19,9 @@ CCamera					gCamera;
 CDirectionalLight		gLight;
 //プレイヤー
 CPlayer					gPlayer;
+//敵
+#define					ENEMY_COUNT			(20)
+CEnemy					gEnemyArray[ENEMY_COUNT];
 //ステージ
 CStage					gStage;
 //デバッグ表示フラグ
@@ -62,7 +66,12 @@ MofBool CGameApp::Initialize(void){
 	//ステージ素材の読み込み
 	gStage.Load();
 	//ステージの状態初期化
-	gStage.Initialize();
+	gStage.Initialize(&gStg1EnemyStart);
+	//敵の初期化
+	for (int i = 0; i < ENEMY_COUNT; i++)
+	{
+		gEnemyArray[i].Initialize();
+	}
 	
 	return TRUE;
 }
@@ -79,7 +88,12 @@ MofBool CGameApp::Update(void){
 	//プレイヤーの更新
 	gPlayer.Update();
 	//ステージの更新
-	gStage.Update();
+	gStage.Update(gEnemyArray,ENEMY_COUNT);
+	//敵の更新
+	for (int i = 0; i < ENEMY_COUNT; i++)
+	{
+		gEnemyArray[i].Update();
+	}
 	//デバッグ表示の切り替え
 	if (g_pInput->IsKeyPush(MOFKEY_F1))
 	{
@@ -96,6 +110,7 @@ MofBool CGameApp::Update(void){
 	vup.RotationZ(gPlayer.GetPosition().x / FIELD_HALF_X * MOF_ToRadian(10.0f));
 	gCamera.LookAt(cpos, tpos, vup);
 	gCamera.Update();
+
 	return TRUE;
 }
 
@@ -119,6 +134,11 @@ MofBool CGameApp::Render(void){
 	gPlayer.Render();
 	//ステージの描画
 	gStage.Render();
+	//敵の描画
+	for (int i = 0; i < ENEMY_COUNT; i++)
+	{
+		gEnemyArray[i].Render();
+	}
 	//3Dデバッグ描画
 	if (gbDebug)
 	{
@@ -138,6 +158,11 @@ MofBool CGameApp::Render(void){
 		gPlayer.RenderDebugText();
 		//ステージのデバッグ文字描画
 		gStage.RenderDebugText();
+		//敵のデバッグ文字描画
+		for (int i = 0; i < ENEMY_COUNT; i++)
+		{
+			gEnemyArray[i].RenderDebugText(i);
+		}
 	}
 
 	// 描画の終了
