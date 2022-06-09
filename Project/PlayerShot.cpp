@@ -60,3 +60,14 @@ void CPlayerShot::Render(void){
 	wMat.Translation(m_Pos);	//移動限定のマトリクス生成
 	m_pMesh->Render(wMat);
 }
+
+/**
+* デバッグ描画
+*/
+void CPlayerShot::RenderDebug(void) {
+	if (!m_bShow)
+	{
+		return;
+	}
+	CGraphicsUtilities::RenderSphere(GetSphere(), Vector4(0, 1, 0, 0.3f));
+}
