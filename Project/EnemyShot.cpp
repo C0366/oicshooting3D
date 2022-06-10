@@ -55,12 +55,12 @@ void CEnemyShot::Update(){
 	m_Pos += m_Spd;	
 	// ‰æ–ÊŠO‚ÅÁ‹
 	float Inflate = 1.0f;
-	if (m_Pos.x < FIELD_HALF_X - Inflate || FIELD_HALF_X + Inflate < m_Pos.x || m_Pos.z < FIELD_HALF_Z - Inflate || FIELD_HALF_Z + Inflate < m_Pos.z)
+	if (m_Pos.x < -FIELD_HALF_X - Inflate || FIELD_HALF_X + Inflate < m_Pos.x || m_Pos.z < -FIELD_HALF_Z - Inflate || FIELD_HALF_Z + Inflate < m_Pos.z)
 	{
 		m_bShow = false;
 	}
 	// ’e‚ğ‰ñ“]
-	m_RotY += MOF_ToRadian)(10);
+	m_RotY += MOF_ToRadian(10);
 	
 }
 

@@ -34,6 +34,7 @@ public:
 	void RenderDebugText();
 	const CVector3 GetPosition(){ return m_Pos; }
 	void CollisionEnemy(CEnemy& ene);
+	void CollisionEnemyShot(CEnemyShot& shot);
 	bool IsDead() { return m_bDead; }
 	void Release();
 };
