@@ -51,7 +51,7 @@ void CEnemy::Initialize(){
  * 開始
  *
  */
-void CEnemy::Start(const Vector3& p){
+void CEnemy::Start(const Vector3& p,int t){
 	m_Pos = p;
 	m_Rot = Vector3(0, 0, 0);
 	m_bShow = true;
@@ -61,18 +61,45 @@ void CEnemy::Start(const Vector3& p){
 	m_TargetPos = Vector3(0, 0, 0);
 	m_AnimTime = 0;
 
+	m_Type = t;
+	switch (m_Type)
+	{
+	case1:
+	case2:
+	case3:
+		m_HP = 100;
+		m_ShotWaitSet = 100;
+		m_ShotWait = m_ShotWaitSet;
+		break;
+	}
+
 }
 
 /**
  * 更新
  *
  */
-void CEnemy::Update(CEnemyShot* shot,int smax){
+void CEnemy::Update(CEnemyShot* shot, int smax) {
 	//非表示
 	if (!GetShow())
 	{
 		return;
 	}
+	switch (m_Type)
+	{
+	case0:		UpdateType0(shot, smax);			break;
+	case1:
+	case2:
+	case3:		UpdateBossParts(shot, smax);		break;
+	}
+}
+/**
+* 更新
+* m_Typeが0の敵の更新関数
+* Update関数からswitchでタイプが一致した場合のみ実行
+*/
+void CEnemy::UpdateType0(CEnemyShot* shot,int smax)
+{
 	//時間を進める
 	m_AnimTime += CUtilities::GetFrameSecond();
 	//アニメーション
@@ -111,7 +138,55 @@ void CEnemy::Update(CEnemyShot* shot,int smax){
 	{
 		m_bShow = false;
 	}
+}
 
+/**
+* 更新
+* m_Typeが1,2,3の敵の更新関数
+* Update関数からswitchでタイプが一致した場合のみ実行
+*/
+void CEnemy::UpdateBossParts(CEnemyShot* shot, int smax) {
+	//弾の発射
+	if (m_ShotWait <= 0)
+	{
+		m_ShotWait = m_ShotWaitSet;
+	}
+	else
+	{
+		m_ShotWait--;
+	}
+
+	if (m_ShotWait % 10 == 0 && m_ShotWait / 10 < 3)
+	{
+		int sCnt = m_Type - 1;
+		for (int cnt = -sCnt; cnt <= sCnt; cnt++)
+		{
+			CEnemyShot* newShot = CEnemyShot::FindAvailableShot(shot, smax);
+			if (!newShot)
+			{
+				continue;
+			}
+
+			//目標地点に向かうための方向
+			Vector3 pos = m_Pos;
+			Vector3 direction = m_TargetPos - pos;
+
+			//目標地点までの距離を求める
+			float distance = CVector3Utilities::Length(direction);
+
+			//距離が0以下=完全に同じ位置の場合は発射しない
+			if (distance <= 0)
+			{
+				continue;
+			}
+
+			//方向を正規化
+			direction /= distance;
+			float ad = atan2(direction.z, direction.x) + cnt * MOF_ToRadian(10);
+			Vector3 vt(cos(ad), 0, sin(ad));
+			newShot->Fire(pos, vt * 0.2f);
+		}
+	}
 }
 
 /**
