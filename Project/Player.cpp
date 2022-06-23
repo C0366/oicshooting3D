@@ -172,7 +172,7 @@ void CPlayer::CollisionEnemy(CEnemy& ene) {
 	{
 		return;
 	}
-	CSphere ps = GetShere();
+	CSphere ps = GetSphere();
 	CSphere es = ene.GetSphere();
 	if (ps.CollisionSphere(es))
 	{
@@ -203,7 +203,7 @@ void CPlayer::CollisionEnemy(CEnemy& ene) {
 * [in]				shot		判定を行う敵弾
 */
 void CPlayer::CollisionEnemyShot(CEnemyShot& shot) {
-	CSphere ps = GetShere();
+	CSphere ps = GetSphere();
 	if (!shot.GetShow())
 	{
 		return;
@@ -215,12 +215,54 @@ void CPlayer::CollisionEnemyShot(CEnemyShot& shot) {
 		shot.SetShow(false);
 	}
 }
+
+/**
+* 当たり判定
+* 引数のボスに対して当たり判定を実行する。
+* 
+* 引数
+* [in]			boss			判定を行うボス
+*/
+void CPlayer::CollisionBoss(CBoss& boss){
+	if (!boss.GetShow())
+	{
+		return;
+	}
+	CSphere ps = GetSphere();
+	CSphere bs = boss.GetSphere();
+	if (ps.CollisionSphere(bs))
+	{
+		m_bDead = true;
+	}
+	//弾との判定
+	for (int i = 0; i < PLAYERSHOT_COUNT; i++)
+	{
+		if (!m_ShotArray[i].GetShow())
+		{
+			continue;
+		}
+		CSphere ss = m_ShotArray[i].GetSphere();
+		if (ss.CollisionSphere(bs))
+		{
+			boss.Damage(1);
+			m_ShotArray[i].SetShow(false);
+			break;
+		}
+	}
+	//パーツとの判定
+	for (int i = 0; i < BOSS_PARTS_MAX; i++)
+	{
+		CollisionEnemy(boss.GetParts(i));
+	}
+
+}
+
 /**
 * デバッグ描画
 */
 void CPlayer::RenderDebug(void) {
 	//当たり判定の表示
-	CGraphicsUtilities::RenderSphere(GetShere(), Vector4(0, 1, 0, 0.3f));
+	CGraphicsUtilities::RenderSphere(GetSphere(), Vector4(0, 1, 0, 0.3f));
 	//弾の描画
 	for (int i = 0; i < PLAYERSHOT_COUNT; i++)
 	{

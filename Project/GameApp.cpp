@@ -12,6 +12,7 @@
 #include	"Player.h"
 #include	"Stage.h"
 #include	"Stage1.h"
+#include    "Boss.h"
 
 //カメラ
 CCamera					gCamera;
@@ -26,8 +27,14 @@ CEnemy					gEnemyArray[ENEMY_COUNT];
 #define					ENEMYSHOT_COUNT		(200)
 CEnemyShot				gShotArray[ENEMYSHOT_COUNT];
 CMeshContainer			gEnemyShotMesh;
+//ボス
+CBoss					gBoss;
 //ステージ
 CStage					gStage;
+//雑魚全滅フラグ
+bool					gbEnemyDestroyed = false;
+//ステージクリアフラグ
+bool					gbClear = false;
 //デバッグ表示フラグ
 bool					gbDebug = false;
 
@@ -76,6 +83,8 @@ MofBool CGameApp::Initialize(void){
 	{
 		return false;
 	}
+	//ボスの素材読み込み
+	gBoss.Load();
 	//敵弾の初期化
 	for (int i = 0; i < ENEMYSHOT_COUNT; i++)
 	{
@@ -87,6 +96,8 @@ MofBool CGameApp::Initialize(void){
 	{
 		gEnemyArray[i].Initialize();
 	}
+	//ボスの状態初期化
+	gBoss.Initialize();
 	
 	return TRUE;
 }
@@ -110,6 +121,9 @@ MofBool CGameApp::Update(void){
 		gEnemyArray[i].SetTargetPos(gPlayer.GetPosition());
 		gEnemyArray[i].Update(gShotArray, ENEMYSHOT_COUNT);
 	}
+	//ボスの更新
+	gBoss.SetTargetPos(gPlayer.GetPosition());
+	gBoss.Update(gShotArray, ENEMYSHOT_COUNT);
 	//敵弾の更新
 	for (int i = 0; i < ENEMYSHOT_COUNT; i++)
 	{
@@ -120,16 +134,45 @@ MofBool CGameApp::Update(void){
 	{
 		gPlayer.CollisionEnemy(gEnemyArray[i]);
 	}
+	//ボスとの当たり判定
+	gPlayer.CollisionBoss(gBoss);
 	//敵弾との当たり判定
 	for (int i = 0; i < ENEMYSHOT_COUNT; i++)
 	{
 		gPlayer.CollisionEnemyShot(gShotArray[i]);
+	}
+	//雑魚全滅判定
+	if (!gbEnemyDestroyed && gStage.IsAllEnemy())
+	{
+		bool btmp = true;
+		for (int i = 0; i < ENEMY_COUNT; i++)
+		{
+			if (gEnemyArray[i].GetShow())
+			{
+				btmp = false;
+			}
+		}
+		gbEnemyDestroyed = btmp;
+		//全滅していればボス出現
+		if (gbEnemyDestroyed)
+		{
+			gBoss.Start();
+			gBoss.SetTargetPos(gPlayer.GetPosition());
+			gBoss.Update(gShotArray, ENEMYSHOT_COUNT);
+		}
+	}
+	//ゲームクリア判定
+	if (!gbClear && gbEnemyDestroyed && !gBoss.GetShow())
+	{
+		gbClear = true;
 	}
 	//デバッグ表示の切り替え
 	if (g_pInput->IsKeyPush(MOFKEY_F1))
 	{
 		gbDebug = ((gbDebug) ? false : true);
 	}
+	//ゲームオーバー、ゲームクリアー表示後にEnterで初期化を行う
+	
 	//ゲームオーバー表示後にEnterで初期化を行う
 	if (g_pInput->IsKeyPush(MOFKEY_RETURN) && gPlayer.IsDead())
 	{

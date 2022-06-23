@@ -3,6 +3,7 @@
 #include "GameDefine.h"
 #include "PlayerShot.h"
 #include "Enemy.h"
+#include "Boss.h"
 
 // ˆÚ“®‘¬“x
 #define PLAYER_SPEED		(0.1f)
@@ -30,11 +31,12 @@ public:
 	void Update();
 	void Render();
 	void RenderDebug();
-	CSphere GetShere() { return CSphere(m_Pos, 0.4f); }
+	CSphere GetSphere() { return CSphere(m_Pos, 0.4f); }
 	void RenderDebugText();
 	const CVector3 GetPosition(){ return m_Pos; }
 	void CollisionEnemy(CEnemy& ene);
 	void CollisionEnemyShot(CEnemyShot& shot);
+	void CollisionBoss(CBoss& boss);
 	bool IsDead() { return m_bDead; }
 	void Release();
 };
