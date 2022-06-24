@@ -33,14 +33,13 @@ public:
 	void UpdateBossParts(CEnemyShot* shot, int smax);
 	void SetPosition(const Vector3& p) { m_Pos = p; }
 	void SetRotation(const Vector3& r) { m_Rot = r; }
-	CSphere GetSphere()
-	{
+	CSphere GetSphere(){
 		switch (m_Type)
 		{
-		case1:
-		case2:
-		case3:
-			return CSphere(m_Pos, 0.5f);
+		case 1:
+		case 2:
+		case 3:
+			return CSphere(m_Pos, 1.5f);
 		}
 		return CSphere(m_Pos, 0.5f);
 	}

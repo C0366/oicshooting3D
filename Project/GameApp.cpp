@@ -172,7 +172,12 @@ MofBool CGameApp::Update(void){
 		gbDebug = ((gbDebug) ? false : true);
 	}
 	//ゲームオーバー、ゲームクリアー表示後にEnterで初期化を行う
-	
+	if (g_pInput->IsKeyPush(MOFKEY_RETURN) && (gPlayer.IsDead() || gbClear))
+	{
+		//クリアフラグを戻す
+		gbEnemyDestroyed = false;
+		gbClear = false;
+	}
 	//ゲームオーバー表示後にEnterで初期化を行う
 	if (g_pInput->IsKeyPush(MOFKEY_RETURN) && gPlayer.IsDead())
 	{
@@ -187,6 +192,7 @@ MofBool CGameApp::Update(void){
 		{
 			gShotArray[i].Initialize();
 		}
+		gBoss.Initialize();
 	}
 
 	//プレイヤーの動きに合わせてカメラを動かす
@@ -228,6 +234,8 @@ MofBool CGameApp::Render(void){
 	{
 		gEnemyArray[i].Render();
 	}
+	//ボスの描画
+	gBoss.Render();
 	//敵弾の描画
 	for (int i = 0; i < ENEMYSHOT_COUNT; i++)
 	{
@@ -243,6 +251,8 @@ MofBool CGameApp::Render(void){
 		{
 			gEnemyArray[i].RenderDebug();
 		}
+		//ボスのデバッグ描画
+		gBoss.RenderDebug();
 		//敵弾のデバッグ描画
 		for (int i = 0; i < ENEMYSHOT_COUNT; i++)
 		{
@@ -275,6 +285,11 @@ MofBool CGameApp::Render(void){
 	{
 		CGraphicsUtilities::RenderString(240, 350, MOF_COLOR_RED, "ゲームオーバー　：　Enterキーでもう一度最初から");
 	}
+	//ゲームクリア表示
+	else if (gbClear)
+	{
+		CGraphicsUtilities::RenderString(240, 350, MOF_COLOR_RED, "ゲームクリア　：　Enterキーでもう一度最初から");
+	}
 
 	// 描画の終了
 	g_pGraphics->RenderEnd();
@@ -291,5 +306,6 @@ MofBool CGameApp::Release(void){
 	gPlayer.Release();
 	gStage.Release();
 	gEnemyShotMesh.Release();
+	gBoss.Release();
 	return TRUE;
 }

@@ -62,11 +62,11 @@ void CEnemy::Start(const Vector3& p,int t){
 	m_AnimTime = 0;
 
 	m_Type = t;
-	switch (m_Type)
+	switch(m_Type)
 	{
-	case1:
-	case2:
-	case3:
+	case 1:
+	case 2:
+	case 3:
 		m_HP = 100;
 		m_ShotWaitSet = 100;
 		m_ShotWait = m_ShotWaitSet;
@@ -87,12 +87,13 @@ void CEnemy::Update(CEnemyShot* shot, int smax) {
 	}
 	switch (m_Type)
 	{
-	case0:		UpdateType0(shot, smax);			break;
-	case1:
-	case2:
-	case3:		UpdateBossParts(shot, smax);		break;
+	case 0:		UpdateType0(shot, smax);			break;
+	case 1:
+	case 2:
+	case 3:		UpdateBossParts(shot, smax);		break;
 	}
 }
+
 /**
 * 更新
 * m_Typeが0の敵の更新関数
@@ -102,9 +103,11 @@ void CEnemy::UpdateType0(CEnemyShot* shot,int smax)
 {
 	//時間を進める
 	m_AnimTime += CUtilities::GetFrameSecond();
+
 	//アニメーション
 	m_Pos.y = InterpolationAnim(m_AnimTime, g_EnemyAnimPosY, 2);
 	m_Pos.z = InterpolationAnim(m_AnimTime, g_EnemyAnimPosZ, 5);
+
 	//プレイヤーと同じ高さまで移動したら
 	if (g_EnemyAnimPosY[1].Time < m_AnimTime)
 	{

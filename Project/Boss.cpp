@@ -235,9 +235,7 @@ void CBoss::UpdateParts(int idx, CEnemyShot* shot, int smax, bool bShot){
 	if (g_BossAnimPosY[1].Time <= m_AnimTime && bShot)
 	{
 		parts.SetTargetPos(m_TargetPos);
-		{
-			parts.Update(shot, smax);
-		}
+		parts.Update(shot, smax);
 	}
 }
 
